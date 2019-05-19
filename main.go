@@ -14,21 +14,22 @@ func main() {
 
 	flag.Parse()
 	args := flag.Args()
-	text := readLine(args[0])
-	for i := len(text) - n; i < len(text); i++ {
-		fmt.Println(text[i])
+
+	lines, err := readLine(args[0])
+	if err != nil {
+		fmt.Println(os.Stderr, err)
+		os.Exit(1)
 	}
 
-	// if err := readLine("hoge.txt"); err != nil {
-	// 	fmt.Println(os.Stderr, err)
-	// 	os.Exit(1)
-	// }
+	for i := len(lines) - n; i < len(lines); i++ {
+		fmt.Println(lines[i])
+	}
 }
 
-func readLine(filename string) []string {
+func readLine(filename string) ([]string, error) {
 	file, err := os.Open(filename)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "File %s could not read: %v\n", filename, err)
+		return nil, err
 	}
 	defer file.Close()
 
@@ -38,7 +39,7 @@ func readLine(filename string) []string {
 		lines = append(lines, scanner.Text())
 	}
 	if err := scanner.Err(); err != nil {
-		fmt.Fprintf(os.Stderr, "File %s scan error: %v\n", filename, err)
+		return nil, err
 	}
-	return lines
+	return lines, nil
 }
