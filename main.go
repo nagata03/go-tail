@@ -2,30 +2,43 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 )
 
 func main() {
-	if err := readLine("hoge.txt"); err != nil {
-		fmt.Println(os.Stderr, err)
-		os.Exit(1)
+	const defaultNumOfLines = 10
+	var n int
+	flag.IntVar(&n, "n", defaultNumOfLines, "number of lines to display")
+
+	flag.Parse()
+	args := flag.Args()
+	text := readLine(args[0])
+	for i := len(text) - n; i < len(text); i++ {
+		fmt.Println(text[i])
 	}
+
+	// if err := readLine("hoge.txt"); err != nil {
+	// 	fmt.Println(os.Stderr, err)
+	// 	os.Exit(1)
+	// }
 }
 
-func readLine(filename string) error {
+func readLine(filename string) []string {
 	file, err := os.Open(filename)
 	if err != nil {
-		return err
+		fmt.Fprintf(os.Stderr, "File %s could not read: %v\n", filename, err)
 	}
 	defer file.Close()
 
-	s := bufio.NewScanner(file)
-	for s.Scan() {
-		fmt.Println(s.Text())
+	lines := []string{}
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
 	}
-	if err := s.Err(); err != nil {
-		return err
+	if err := scanner.Err(); err != nil {
+		fmt.Fprintf(os.Stderr, "File %s scan error: %v\n", filename, err)
 	}
-	return nil
+	return lines
 }
