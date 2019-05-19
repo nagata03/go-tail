@@ -15,14 +15,21 @@ func main() {
 	flag.Parse()
 	args := flag.Args()
 
-	lines, err := readLine(args[0])
-	if err != nil {
-		fmt.Println(os.Stderr, err)
-		os.Exit(1)
-	}
+	for _, filename := range args {
+		lines, err := readLine(filename)
+		if err != nil {
+			fmt.Println(os.Stderr, err)
+			os.Exit(1)
+		}
 
-	for i := len(lines) - n; i < len(lines); i++ {
-		fmt.Println(lines[i])
+		fmt.Printf("===> %s <===\n", filename)
+		startLine := 0
+		if n < len(lines) {
+			startLine = len(lines) - n
+		}
+		for i := startLine; i < len(lines); i++ {
+			fmt.Println(lines[i])
+		}
 	}
 }
 
